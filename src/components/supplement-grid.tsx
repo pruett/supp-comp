@@ -6,7 +6,7 @@ import { useSupplements } from "@/hooks/use-supplements";
 
 export function SupplementsGrid() {
   const { filters, sortBy } = useSearchFilters();
-  const { data, isLoading, isError } = useSupplements({ filters, sortBy });
+  const { data } = useSupplements({ filters, sortBy });
 
   if (data?.supplements?.length === 0) {
     return (

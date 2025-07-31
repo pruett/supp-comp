@@ -1,22 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Star, ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import type { Supplement } from "@/lib/types";
-import { useSupplements } from "@/hooks/use-supplements";
 import React from "react";
+import Link from "next/link";
+import { Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useSupplements } from "@/hooks/use-supplements";
+import type { Supplement } from "@/lib/types";
 
 export function ProductComparison({ productIds }: { productIds: string[] }) {
   const { data, isLoading, isError } = useSupplements({ ids: productIds });
 
   const product1 = data?.supplements?.[0];
   const product2 = data?.supplements?.[1];
-
-  // Helper to determine if values are different for highlighting
-  const isDifferent = (val1: unknown, val2: unknown) => val1 !== val2;
 
   if (isError) {
     return (

@@ -14,7 +14,9 @@ export async function getAllSupplements(): Promise<Supplement[]> {
 /**
  * Get a single supplement by ID
  */
-export async function getSupplementById(id: string): Promise<Supplement | null> {
+export async function getSupplementById(
+  id: string,
+): Promise<Supplement | null> {
   const supplements = await getAllSupplements();
   return supplements.find((supplement) => supplement.id === id) || null;
 }
@@ -22,7 +24,9 @@ export async function getSupplementById(id: string): Promise<Supplement | null> 
 /**
  * Get multiple supplements by IDs
  */
-export async function getSupplementsByIds(ids: string[]): Promise<Supplement[]> {
+export async function getSupplementsByIds(
+  ids: string[],
+): Promise<Supplement[]> {
   const supplements = await getAllSupplements();
   return supplements.filter((supplement) => ids.includes(supplement.id));
 }
@@ -33,8 +37,8 @@ export async function getSupplementsByIds(ids: string[]): Promise<Supplement[]> 
 export async function searchSupplements(
   filters: Partial<SearchFilters> = {},
   sort: SortOption = "name-asc",
-  ids?: string[]
-): Promise<{ supplements: Supplement[]; total: number }> {
+  ids?: string[],
+): Promise<{ supplements: Supplement[] }> {
   const supplements = await getAllSupplements();
   let results = [...supplements];
 
@@ -52,15 +56,15 @@ export async function searchSupplements(
         supplement.brand.toLowerCase().includes(query) ||
         supplement.primaryIngredient.toLowerCase().includes(query) ||
         supplement.ingredients.some((ingredient) =>
-          ingredient.name.toLowerCase().includes(query)
-        )
+          ingredient.name.toLowerCase().includes(query),
+        ),
     );
   }
 
   // Apply category filter
   if (filters.categories && filters.categories.length > 0) {
     results = results.filter((supplement) =>
-      filters.categories!.includes(supplement.category)
+      filters.categories!.includes(supplement.category),
     );
   }
 
@@ -69,7 +73,7 @@ export async function searchSupplements(
     const [minPrice, maxPrice] = filters.priceRange;
     results = results.filter(
       (supplement) =>
-        supplement.price >= minPrice && supplement.price <= maxPrice
+        supplement.price >= minPrice && supplement.price <= maxPrice,
     );
   }
 
@@ -78,7 +82,7 @@ export async function searchSupplements(
     const [minTrust, maxTrust] = filters.trustScoreRange;
     results = results.filter(
       (supplement) =>
-        supplement.trustScore >= minTrust && supplement.trustScore <= maxTrust
+        supplement.trustScore >= minTrust && supplement.trustScore <= maxTrust,
     );
   }
 
@@ -87,7 +91,6 @@ export async function searchSupplements(
 
   return {
     supplements: results,
-    total: results.length,
   };
 }
 
@@ -96,7 +99,7 @@ export async function searchSupplements(
  */
 export function sortSupplements(
   supplements: Supplement[],
-  sort: SortOption
+  sort: SortOption,
 ): Supplement[] {
   const sorted = [...supplements];
 

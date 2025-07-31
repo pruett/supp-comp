@@ -19,10 +19,10 @@ export async function GET(
   const { filters, sortBy, ids } = parseSearchParams(searchParams);
 
   // Use shared search logic
-  const { supplements: results, total } = await searchSupplements(
+  const { supplements: results } = await searchSupplements(
     filters,
     sortBy,
-    ids
+    ids,
   );
 
   return NextResponse.json({

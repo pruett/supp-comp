@@ -5,7 +5,7 @@ import type { SupplementCategory } from "@/lib/types";
 export type CategoriesAPIResponse = SupplementCategory[];
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
 ): Promise<NextResponse<CategoriesAPIResponse>> {
   return NextResponse.json(categories);
 }

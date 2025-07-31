@@ -1,6 +1,5 @@
 import { SearchFiltersGrid } from "@/components/search-filters";
 import { SupplementsGrid } from "@/components/supplement-grid";
-import { ComparisonToast } from "@/components/comparison-toast";
 
 export default function Page() {
   return (
