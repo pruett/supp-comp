@@ -6,6 +6,7 @@ import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSupplements } from "@/hooks/use-supplements";
 import type { Supplement } from "@/lib/types";
+import { Skeleton } from "./ui/skeleton";
 
 export function ProductComparison({ productIds }: { productIds: string[] }) {
   const { data, isLoading, isError } = useSupplements({ ids: productIds });
@@ -24,12 +25,23 @@ export function ProductComparison({ productIds }: { productIds: string[] }) {
   if (isLoading || !product1 || !product2) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <p>Loading product data...</p>
+        <div className="space-y-8">
+          {/* Product Headers */}
+          <div className="sticky top-0 z-10 grid grid-cols-3 gap-4 bg-card rounded-lg border p-6 shadow-sm">
+            <div />
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-40 w-full" />
+          </div>
+
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+        </div>
       </div>
     );
   }
 
-  // Helper function to get all unique ingredients for comparison
   const getAllIngredients = () => {
     const allIngredientNames = new Set([
       ...product1.ingredients.map((i) => i.name),
@@ -38,7 +50,6 @@ export function ProductComparison({ productIds }: { productIds: string[] }) {
     return Array.from(allIngredientNames).sort();
   };
 
-  // Helper function to get all unique trust score breakdown keys
   const getTrustScoreKeys = () => {
     const allKeys = new Set([
       ...Object.keys(product1.trustScoreBreakdown),
@@ -47,17 +58,12 @@ export function ProductComparison({ productIds }: { productIds: string[] }) {
     return Array.from(allKeys).sort();
   };
 
-  // Helper to get ingredient by name
   const getIngredient = (supplement: Supplement, ingredientName: string) => {
     return supplement.ingredients.find((i) => i.name === ingredientName);
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Product Comparison</h1>
-      </div>
-
       <div className="space-y-8">
         {/* Product Headers */}
         <div className="sticky top-0 z-10 grid grid-cols-3 gap-4 bg-card rounded-lg border p-6 shadow-sm">

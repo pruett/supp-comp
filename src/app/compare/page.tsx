@@ -37,6 +37,7 @@ export default async function Page({ searchParams }: PageProps) {
           </div>
         </div>
       </header>
+
       <ProductComparison productIds={productIds} />
     </div>
   );

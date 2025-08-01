@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSupplement } from "@/hooks/use-supplement";
 import { useComparison } from "@/context/comparison";
 import { Scale, Star } from "lucide-react";
@@ -14,7 +15,20 @@ export function ProductDetail({ id }: { id: string }) {
     useComparison();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+          <div className="lg:col-span-1">
+            <Skeleton className="h-120 w-full" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!supplement) {

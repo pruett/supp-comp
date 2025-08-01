@@ -3,10 +3,26 @@
 import { SupplementCard } from "@/components/supplement-card";
 import { useSearchFilters } from "@/context/search-filters";
 import { useSupplements } from "@/hooks/use-supplements";
+import { Skeleton } from "./ui/skeleton";
 
 export function SupplementsGrid() {
   const { filters, sortBy } = useSearchFilters();
-  const { data } = useSupplements({ filters, sortBy });
+  const { data, isLoading } = useSupplements({ filters, sortBy });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 @container">
+        <div className="grid grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-3 gap-6">
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   if (data?.supplements?.length === 0) {
     return (

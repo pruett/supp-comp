@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupplementById } from "@/app/api/supplements/utils";
 import type { Supplement } from "@/lib/types";
 
-// Define the API response type for individual supplement
 export type SupplementDetailAPIResponse = Supplement;
 
-// Define error response type
 export type SupplementDetailErrorAPIResponse = {
   error: string;
   code: string;
 };
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(
@@ -23,7 +21,7 @@ export async function GET(
 ): Promise<
   NextResponse<SupplementDetailAPIResponse | SupplementDetailErrorAPIResponse>
 > {
-  const { id } = params;
+  const { id } = await params;
 
   // Validate ID parameter
   if (!id || typeof id !== "string") {
@@ -38,7 +36,6 @@ export async function GET(
     );
   }
 
-  // Use shared logic to get supplement by ID
   const supplement = await getSupplementById(id);
 
   if (!supplement) {
@@ -53,6 +50,5 @@ export async function GET(
     );
   }
 
-  // Return the supplement
   return NextResponse.json(supplement);
 }
