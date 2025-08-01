@@ -1,11 +1,13 @@
 # SuppComp - Supplement Comparison App
 
+**Production URL**: https://supp-comp.vercel.app/
+
 A modern supplement comparison application built with Next.js 15, TypeScript, and TailwindCSS. Search, inspect, and compare your favorite supplements with detailed product information and trust scores.
 
 ## Features
 
 - **🔍 Search & Filter**: Advanced search with category, price, and trust score filters
-- **📊 Product Details**: Comprehensive product information including ingredients and certifications  
+- **📊 Product Details**: Comprehensive product information including ingredients and certifications
 - **⚖️ Side-by-Side Comparison**: Compare up to 2 products with highlighted differences
 - **🎯 Trust Scores**: Detailed trust score breakdowns for informed decisions
 - **📱 Responsive Design**: Optimized for all device sizes
@@ -17,29 +19,41 @@ A modern supplement comparison application built with Next.js 15, TypeScript, an
 - **Language**: TypeScript
 - **Styling**: TailwindCSS 4.0
 - **UI Components**: shadcn/ui with Radix UI primitives
+- **Data Fetching (Client side)**: SWR
 - **Icons**: Lucide React
 - **Package Manager**: pnpm
 
-## Getting Started
+## Local Setup
 
 ### Prerequisites
 
-- Node.js 22 LTS or higher
-- pnpm (recommended) or npm
+Ensure you have the following installed on your system:
 
-### Installation
+- **Node.js**: Version 22 LTS or higher ([Download](https://nodejs.org/))
+- **pnpm**: Recommended package manager ([Install](https://pnpm.io/installation))
+  ```bash
+  npm install -g pnpm
+  ```
 
-1. Install dependencies:
+### Installation Steps
+
+1. **Clone the repository** (or navigate to project directory):
+   ```bash
+   cd supp-comp
+   ```
+
+2. **Install dependencies**:
    ```bash
    pnpm install
    ```
 
-2. Start the development server:
+3. **Start the development server**:
    ```bash
    pnpm dev
    ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. **Open the application**:
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Available Scripts
 
@@ -48,100 +62,268 @@ pnpm dev          # Start development server with Turbopack
 pnpm build        # Build for production
 pnpm start        # Start production server
 pnpm lint         # Run ESLint
+pnpm type-check   # Run TypeScript type checking
 ```
 
-## Project Structure
+### Verification
 
+Once running, you should see:
+- Main search page with supplement grid
+- Working search and filter functionality
+- Clickable product cards leading to detail pages
+- Functional product comparison system
+
+## Code Walkthrough
+
+### Application Architecture
+
+The application follows Next.js 15 App Router patterns with a clear separation between server and client components:
+
+#### Directory Structure
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Main search page
-│   ├── product/[id]/      # Product detail pages
-│   └── compare/           # Product comparison page
-├── components/            # Reusable UI components
-│   ├── ui/               # shadcn/ui components
-│   ├── supplement-card.tsx
-│   ├── search-filters.tsx
-│   ├── product-detail.tsx
-│   └── product-comparison.tsx
-├── context/              # React Context providers
-│   └── supplements-context.tsx
-├── data/                 # Data layer
-│   ├── supplement-service.ts  # In-memory service layer
-│   └── mock-data.ts          # Sample supplement data
-└── lib/
-    ├── types.ts          # TypeScript type definitions
-    └── utils.ts          # Utility functions
+├── app/                          # Next.js App Router
+│   ├── api/                     # API routes (server-side)
+│   │   ├── categories/          # GET /api/categories
+│   │   │   └── route.ts
+│   │   └── supplements/         # Supplement endpoints
+│   │       ├── [id]/           # GET /api/supplements/[id]
+│   │       │   └── route.ts
+│   │       ├── route.ts        # GET /api/supplements
+│   │       └── utils.ts        # Shared API logic
+│   ├── compare/                 # Product comparison page
+│   │   └── page.tsx
+│   ├── supplements/             # Product detail pages
+│   │   └── [id]/
+│   │       └── page.tsx
+│   ├── globals.css             # Global styles
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Main search page
+├── components/                  # Reusable UI components
+│   ├── ui/                     # shadcn/ui base components
+│   │   └── ...
+│   └── ...                      # Application-specific components
+├── context/                     # React Context providers
+│   ├── comparison.tsx          # Product comparison state
+│   └── search-filters.tsx      # Search and filter state
+├── db/                         # Data layer
+│   └── mock-data.ts           # Sample supplement data (30 products)
+├── hooks/                      # Custom React hooks
+│   ├── use-categories.tsx     # Fetch available categories
+│   ├── use-supplement.ts      # Fetch single supplement
+│   └── use-supplements.tsx    # Fetch/search supplements
+└── lib/                       # Shared utilities
+    └── types.ts              # TypeScript type definitions
 ```
 
-## Architecture Decisions
+#### Key Architectural Decisions
 
-### In-Memory Service Layer
+**1. Server vs Client Components**
+- **Server Components**: Pages, layouts, and initial data loading
+- **Client Components**: Interactive features (search, filters, comparison)
+- **API Routes**: Server-side data processing and filtering
 
-The app uses an in-memory service layer (`SupplementService`) that simulates a real backend API. This approach allows for:
+**2. State Management Strategy**
+- **React Context**: Global state for search filters and product comparison
+- **URL State**: Shareable comparisons via query parameters
 
-- Easy swapping with real HTTP APIs later
-- Consistent interface for data operations  
-- Simulated network delays for realistic UX
-- Type-safe data operations
+**3. Client-side Data Fetching**
+- **SWR**: Use the SWR library to perform client-side fetch requests with caching and revalidation built-in
+- **Hooks**: Create custom hooks to encapsulate logic and make portable
 
-### Future HTTP API Contract
-
-When implementing a real backend, the API would follow this structure:
-
+**4. Data Flow**
 ```
-GET /api/supplements?search=creatine&category=Creatine&minPrice=10&maxPrice=50&minTrust=7&sort=price-asc
-GET /api/supplements/:id
+User Interaction → Context State → SWR Hook → API Route → Mock Data → Response
+```
+
+**5. Component Composition**
+- **Compound Components**: Search filters with multiple controls
+- **Render Props**: Flexible data fetching with loading states
+- **Context Providers**: Shared state across component tree
+
+#### Performance Optimizations
+
+- **Turbopack**: Fast development builds
+- **SWR Caching**: Reduces redundant API calls
+- **Server Components**: Reduced client-side JavaScript
+- **Responsive Images**: Optimized for different screen sizes
+- **Code Splitting**: Automatic route-based splitting
+
+## API Design
+
+The application implements a RESTful API design with three main endpoints. All responses include proper HTTP status codes and error handling.
+
+### GET /api/supplements
+
+**Description**: Search and filter supplements with pagination and sorting.
+
+**Query Parameters**:
+- `query` (string): Search term for name, brand, or ingredients
+- `categories` (string): Comma-separated category names
+- `priceMin` (number): Minimum price filter
+- `priceMax` (number): Maximum price filter
+- `trustMin` (number): Minimum trust score filter
+- `trustMax` (number): Maximum trust score filter
+- `sortBy` (string): Sort option (`name-asc`, `name-desc`, `price-asc`, `price-desc`, `trust-asc`, `trust-desc`)
+- `ids` (string): Comma-separated supplement IDs for specific lookups
+
+**Example Request**:
+```
+GET /api/supplements?query=creatine&categories=Creatine,Protein&priceMin=20&priceMax=50&sortBy=price-asc
+```
+
+**Response Shape**:
+```json
+{
+  "supplements": [
+    {
+      "id": "1",
+      "name": "Creatine Monohydrate",
+      "brand": "Optimum Nutrition",
+      "category": "Creatine",
+      "primaryIngredient": "Creatine Monohydrate",
+      "trustScore": 9.2,
+      "price": 24.99,
+      "ingredients": [
+        {
+          "name": "Creatine Monohydrate",
+          "amount": "5",
+          "unit": "g"
+        }
+      ],
+      "certifications": ["NSF Certified", "Informed Sport"],
+      "trustScoreBreakdown": {
+        "thirdPartyTesting": 9.5,
+        "ingredientTransparency": 9.2,
+        "manufacturingQuality": 9.0,
+        "brandReputation": 9.1
+      }
+    }
+  ],
+  "total": 1,
+  "filters": {
+    "query": "creatine",
+    "categories": ["Creatine", "Protein"],
+    "priceRange": [20, 50],
+    "trustScoreRange": [0, 10]
+  },
+  "sortBy": "price-asc"
+}
+```
+
+### GET /api/supplements/[id]
+
+**Description**: Get detailed information for a specific supplement.
+
+**Path Parameters**:
+- `id` (string): Unique supplement identifier
+
+**Example Request**:
+```
+GET /api/supplements/1
+```
+
+**Success Response (200)**:
+```json
+{
+  "id": "1",
+  "name": "Creatine Monohydrate",
+  "brand": "Optimum Nutrition",
+  "category": "Creatine",
+  "primaryIngredient": "Creatine Monohydrate",
+  "trustScore": 9.2,
+  "price": 24.99,
+  "ingredients": [
+    {
+      "name": "Creatine Monohydrate",
+      "amount": "5",
+      "unit": "g"
+    }
+  ],
+  "certifications": ["NSF Certified", "Informed Sport"],
+  "trustScoreBreakdown": {
+    "thirdPartyTesting": 9.5,
+    "ingredientTransparency": 9.2,
+    "manufacturingQuality": 9.0,
+    "brandReputation": 9.1
+  }
+}
+```
+
+**Error Response (404)**:
+```json
+{
+  "error": "Supplement not found",
+  "code": "NOT_FOUND"
+}
+```
+
+**Error Response (400)**:
+```json
+{
+  "error": "Invalid supplement ID provided",
+  "code": "INVALID_ID"
+}
+```
+
+### GET /api/categories
+
+**Description**: Get list of available supplement categories.
+
+**Example Request**:
+```
 GET /api/categories
 ```
 
-### Component Architecture
+**Response Shape**:
+```json
+[
+  "Creatine",
+  "Fish Oil",
+  "Protein",
+  "Vitamins",
+  "Pre-Workout"
+]
+```
 
-- **Server Components**: For initial data loading and SEO optimization
-- **Client Components**: For interactive features requiring React hooks
-- **Context + use()**: For efficient client-side state management
-- **URL State**: For shareable comparisons and filter persistence
+### Data Models
 
-## Features Overview
+**Supplement Object**:
+```typescript
+interface Supplement {
+  id: string;
+  name: string;
+  brand: string;
+  category: SupplementCategory;
+  primaryIngredient: string;
+  trustScore: number; // 0-10
+  price: number;
+  ingredients: Ingredient[];
+  certifications: string[];
+  trustScoreBreakdown: TrustScoreBreakdown;
+}
 
-### 1. Search & Discovery
-- Full-text search across product names, brands, and ingredients
-- Multi-select category filtering
-- Price range and trust score sliders
-- Multiple sorting options
-- Real-time result updates
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
 
-### 2. Product Details
-- Comprehensive product information display
-- Trust score breakdown with visual indicators
-- Complete ingredient lists with amounts
-- Third-party certifications
-- Related actions (add to cart, compare, wishlist)
-
-### 3. Product Comparison  
-- Side-by-side comparison of 2 products
-- Highlighted differences for easy identification
-- Detailed ingredient and certification comparison
-- URL-based state for shareable comparisons
+interface TrustScoreBreakdown {
+  thirdPartyTesting: number; // 0-10
+  ingredientTransparency: number; // 0-10
+  manufacturingQuality: number; // 0-10
+  brandReputation: number; // 0-10
+}
+```
 
 ## Sample Data
 
-The app includes 30 realistic supplement products across 5 categories:
-- **Creatine** (5 products)
-- **Fish Oil** (5 products) 
-- **Protein** (8 products)
-- **Vitamins** (7 products)
-- **Pre-Workout** (5 products)
+The application includes 30 realistic supplement products across 5 categories:
+- **Creatine** (5 products): Various creatine forms from reputable brands
+- **Fish Oil** (5 products): Including traditional fish oil, krill oil, and algae-based options
+- **Protein** (8 products): Whey, casein, plant-based, and specialty proteins
+- **Vitamins** (7 products): Essential vitamins and minerals with various forms
+- **Pre-Workout** (5 products): Performance supplements with detailed ingredient profiles
 
-Each product includes realistic data for brands like Optimum Nutrition, Thorne, NOW Foods, and others.
-
-## Development Notes
-
-This application was built using AI assistance to demonstrate:
-- Modern React patterns with Next.js 15
-- TypeScript best practices
-- Component composition with shadcn/ui
-- Responsive design principles
-- Performance optimization techniques
-
-The codebase follows industry standards and is production-ready with proper error handling, loading states, and accessibility considerations.
+Each product includes realistic data for trusted brands like Optimum Nutrition, Thorne, NOW Foods, Nordic Naturals, and others.
